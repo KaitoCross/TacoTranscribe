@@ -75,6 +75,22 @@ void MainWindow::enableTextBtns()
     ui->audioUsuitedSkip->setEnabled(true);
 }
 
+void MainWindow::updateProgBar(int max, int current)
+{
+    ui->progressBar->setMaximum(max);
+    ui->progressBar->setValue(current);
+}
+
+void MainWindow::on_position_change(int position)
+{
+    ui->horizontalSlider->setSliderPosition(position);
+}
+
+void MainWindow::on_duration_change(int duration)
+{
+    ui->horizontalSlider->setMaximum(duration);
+}
+
 void MainWindow::addListener(vController &controller)
 {
  _controller = &controller;
@@ -123,4 +139,10 @@ void MainWindow::on_actionSaveScript_triggered()
 void MainWindow::on_actionSaveSavepoint_triggered()
 {
     _controller->onSave(true);
+}
+
+
+void MainWindow::on_horizontalSlider_sliderReleased()
+{
+        _controller->jumpInAudio(ui->horizontalSlider->sliderPosition());
 }

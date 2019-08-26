@@ -22,6 +22,10 @@ public:
     void setAudiofileLabel(std::string file);
     void enableAudioBtns();
     void enableTextBtns();
+    void updateProgBar(int max, int current);
+public slots:
+    void on_position_change(int position);
+    void on_duration_change(int duration);
 
 private slots:
     void on_replayBtn_clicked();
@@ -49,6 +53,8 @@ private slots:
     void on_actionSaveScript_triggered();
 
     void on_actionSaveSavepoint_triggered();
+
+    void on_horizontalSlider_sliderReleased();
 
 private:
     vController * _controller;

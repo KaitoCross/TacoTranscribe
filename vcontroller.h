@@ -3,6 +3,7 @@ class scriptmodel;
 class MainWindow;
 #include <string>
 #include <filesystem>
+#include <QObject>
 
 class vController
 {
@@ -21,6 +22,7 @@ public:
     void onUnsuitableAudio();
     void onLoadSavedProgress();
     void onSave(bool progress);
+    void jumpInAudio(qint64 position);
 private:
     MainWindow* _window;
     scriptmodel* _scriptModel;

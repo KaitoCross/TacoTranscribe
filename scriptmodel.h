@@ -1,5 +1,6 @@
 #include "csvlist.h"
 #include <QMediaPlayer>
+#include <QObject>
 #include <fstream>
 #include <filesystem>
 #include <string>
@@ -18,7 +19,7 @@ public:
     void loadWorkingFile(std::string);
     void loadNextLine(list<string>);
     void setAudioDir(string dir);
-    void playCurrentAudio();
+    void playCurrentAudio(qint64 position);
     void playNextAudio();
     void shiftAudioAlignmentUp();
     void shiftAudioAlignmentDown();
@@ -32,7 +33,7 @@ public:
     void saveProgress(std::filesystem::path filename);
     void saveOrigScript(std::filesystem::path filename);
 private:
-    void playAudio(filesystem::path a_path, string _audiofile);
+    void playAudio(filesystem::path a_path, string _audiofile, qint64 position = 0);
     vController *_my_control;
     std::string _audiodir;
     MainWindow *_main_win;

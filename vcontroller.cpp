@@ -22,6 +22,7 @@ void vController::onLoadOrigScript()
     std::string test = fileName.toStdString();
     if (!test.empty())
         _scriptModel->loadWorkingFile(test);
+
 }
 
 void vController::onNextLine(string japLine, string editedLine, string audiofile)
@@ -44,7 +45,7 @@ void vController::onLoadAudioDir()
 
 void vController::onReplay()
 {
-    _scriptModel->playCurrentAudio();
+    _scriptModel->playCurrentAudio(0);
 }
 
 void vController::onNextAudioBtn()
@@ -119,4 +120,9 @@ void vController::onSave(bool progress)
         }
         _scriptModel->saveOrigScript(savedScriptFile);
     }
+}
+
+void vController::jumpInAudio(qint64 position)
+{
+    _scriptModel->playCurrentAudio(position);
 }

@@ -23,6 +23,9 @@ scriptmodel::scriptmodel(vController& vcont, MainWindow& mwin)
     audiofile="";
     _currentLine = list<string>();
     mediaPlayer = new QMediaPlayer();
+    _main_win->updateProgBar(100,0);
+    QObject::connect(mediaPlayer, &QMediaPlayer::positionChanged,&mwin,&MainWindow::on_position_change);
+    QObject::connect(mediaPlayer, &QMediaPlayer::durationChanged,&mwin,&MainWindow::on_duration_change);
 }
 
 void scriptmodel::loadWorkingFile(string filePath)
@@ -44,18 +47,18 @@ void scriptmodel::setAudioDir(string dir)
     _audiodir = dir;
     if (!_currentLine.empty())
     {
-        playCurrentAudio();
+        playCurrentAudio(0);
     }
     _main_win->enableAudioBtns();
 }
 
 
 
-void scriptmodel::playCurrentAudio()
+void scriptmodel::playCurrentAudio(qint64 position = 0)
 {
     filesystem::path a_path = filesystem::path(_audiodir);
     a_path.append(audiofile);
-    playAudio(a_path, audiofile);
+    playAudio(a_path, audiofile, position);
 }
 
 void scriptmodel::playNextAudio()
@@ -186,11 +189,12 @@ void scriptmodel::saveOrigScript(filesystem::path filename)
     saveFile(_workingList,filename,"|",true);
 }
 
-void scriptmodel::playAudio(filesystem::path a_path, string _audiofile)
+void scriptmodel::playAudio(filesystem::path a_path, string _audiofile, qint64 position)
 {
     if (filesystem::exists(a_path))
     {
         mediaPlayer->setMedia(QUrl::fromLocalFile(QString::fromStdString(a_path.string())));
+        mediaPlayer->setPosition(position);
         mediaPlayer->play();
         _main_win->setAudiofileLabel(_audiofile);
     }
@@ -217,4 +221,5 @@ void scriptmodel::refreshView(list<string> firstLine = list<string>())
     audiofile = firstLine.front();
     _main_win->setAudiofileLabel(audiofile);
     playCurrentAudio();
+    _main_win->updateProgBar(_workingList.getMaxRows(),_workingList.getReadPos()-1);
 }

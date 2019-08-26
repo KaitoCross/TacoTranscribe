@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>703</width>
-    <height>522</height>
+    <width>698</width>
+    <height>575</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,15 +48,29 @@
      <rect>
       <x>0</x>
       <y>260</y>
-      <width>693</width>
-      <height>201</height>
+      <width>691</width>
+      <height>251</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="OggFileName">
        <property name="text">
         <string>audiofile</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="horizontalSlider">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
@@ -162,7 +176,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>703</width>
+     <width>698</width>
      <height>20</height>
     </rect>
    </property>
