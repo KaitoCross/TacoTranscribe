@@ -32,9 +32,11 @@ SOURCES += \
         vcontroller.cpp
 
 HEADERS += \
+        MySliderStype.h \
         csvlist.h \
         mainwindow.h \
         scriptmodel.h \
+        MySliderStype.h \
         vcontroller.h
 
 FORMS += \

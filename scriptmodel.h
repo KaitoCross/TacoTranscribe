@@ -16,7 +16,7 @@ public:
     scriptmodel();
     ~scriptmodel();
     scriptmodel(vController&, MainWindow&);
-    void loadWorkingFile(std::string);
+    void loadWorkingFile(std::string, short *data_std);
     void loadNextLine(list<string>);
     void setAudioDir(string dir);
     void playCurrentAudio(qint64 position);
@@ -26,12 +26,13 @@ public:
     void replaceAudiofile(string);
     void markCurrentAudioMissing();
     void removeCurrLine();
-    void loadProgressFile(string fileName);
+    void loadProgressFile(string fileName, short *data_standard);
     void loadLine(int line, bool forward);
-    int loadFile(string filePath, csvlist<string>& targetObject, bool display = true);
-    void saveFile(csvlist<string>& targetObject, std::filesystem::path filename,string seperator,bool overwrite);
-    void saveProgress(std::filesystem::path filename);
-    void saveOrigScript(std::filesystem::path filename);
+    int loadFile(string filePath, csvlist<string>& targetObject, bool display = true, short *data_std = nullptr);
+    void saveFile(csvlist<string>& targetObject, std::filesystem::path filename,string seperator,bool overwrite,short *data_std);
+    void saveProgress(std::filesystem::path filename,short *data_std);
+    void saveOrigScript(std::filesystem::path filename,short *data_std);
+    void enableButtons();
 private:
     void playAudio(filesystem::path a_path, string _audiofile, qint64 position = 0);
     vController *_my_control;

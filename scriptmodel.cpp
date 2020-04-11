@@ -1,11 +1,16 @@
 
 #include "scriptmodel.h"
 #include "mainwindow.h"
+#include <iostream>
 
 scriptmodel::scriptmodel()
 {
-_workingList = csvlist<string>(3);
-_resultList = csvlist<string>(3);
+    _workingList = csvlist<string>(3);
+    _resultList = csvlist<string>(3);
+    _audiodir="";
+    audiofile="";
+    _currentLine = list<string>();
+    mediaPlayer = new QMediaPlayer();
 }
 
 scriptmodel::~scriptmodel()
@@ -28,11 +33,11 @@ scriptmodel::scriptmodel(vController& vcont, MainWindow& mwin)
     QObject::connect(mediaPlayer, &QMediaPlayer::durationChanged,&mwin,&MainWindow::on_duration_change);
 }
 
-void scriptmodel::loadWorkingFile(string filePath)
+void scriptmodel::loadWorkingFile(string filePath, short *data_std)
 {
     //_workingList = csvlist<string>(3);
-    loadFile(filePath,_workingList);
-    _main_win->enableTextBtns();
+    loadFile(filePath,_workingList,true,data_std);
+    enableButtons();
 }
 
 void scriptmodel::loadNextLine(list<string> args)
@@ -49,15 +54,23 @@ void scriptmodel::setAudioDir(string dir)
     {
         playCurrentAudio(0);
     }
-    _main_win->enableAudioBtns();
+    enableButtons();
 }
 
-
+void scriptmodel::enableButtons()
+{
+    if ((_audiodir != "") && (_workingList.getMaxRows() > 0))
+    {
+        _main_win->enableAudioBtns();
+        _main_win->enableTextBtns();
+    }
+}
 
 void scriptmodel::playCurrentAudio(qint64 position = 0)
 {
     filesystem::path a_path = filesystem::path(_audiodir);
     a_path.append(audiofile);
+    std::cout<<audiofile << " is the audio"<<endl;
     playAudio(a_path, audiofile, position);
 }
 
@@ -106,9 +119,9 @@ void scriptmodel::removeCurrLine()
     refreshView(list<string>());
 }
 
-void scriptmodel::loadProgressFile(string fileName)
+void scriptmodel::loadProgressFile(string fileName, short *data_standard)
 {
-    int lines_loaded = loadFile(fileName,_resultList);
+    int lines_loaded = loadFile(fileName,_resultList,true,data_standard);
     loadLine(lines_loaded, true);
 }
 
@@ -118,7 +131,7 @@ void scriptmodel::loadLine(int line = -1, bool forward = false)
     refreshView(_currentLine);
 }
 
-int scriptmodel::loadFile(string filePath, csvlist<string>& targetObject, bool display)
+int scriptmodel::loadFile(string filePath, csvlist<string>& targetObject, bool display, short *data_std)
 {
     targetObject.clear();
     fstream work_f;
@@ -126,16 +139,40 @@ int scriptmodel::loadFile(string filePath, csvlist<string>& targetObject, bool d
     list<string> row;
     string word, line, temp;
     int lines = 0;
-    while(getline(work_f,line))
+    if (*data_std == 1) //nonstandard dataset edit
     {
-        row.clear();
-        stringstream s(line);
-        while(getline(s,word,'|'))
+        while(getline(work_f,line))
         {
-            row.push_back(word);
+            row.clear();
+            stringstream s(line);
+            while(getline(s,word,'|'))
+            {
+                row.push_back(word);
+            }
+            targetObject.push_back(row);
+            lines++;
         }
-        targetObject.push_back(row);
-        lines++;
+    }
+    if (*data_std == 0) //LJSpeech-like dataset.
+    {
+        while(getline(work_f,line))
+        {
+            row.clear();
+            stringstream s(line);
+            while(getline(s,word,'|'))
+            {
+                row.push_back(word);
+            }
+            string audioName = row.front();
+            //LJSpeech dataset does not save the audio file extension (.wav, .mp3) in their csv file
+            //We require them to be in the dataset!
+            //uncommented line would remove the file extension
+            //audioName = audioName.substr(0,audioName.find_last_of("."));
+            row.pop_front();
+            row.push_back(audioName);
+            targetObject.push_back(row);
+            lines++;
+        }
     }
     if (display)
     {
@@ -145,7 +182,7 @@ int scriptmodel::loadFile(string filePath, csvlist<string>& targetObject, bool d
     return lines;
 }
 
-void scriptmodel::saveFile(csvlist<string> &targetObject, filesystem::path filename, string seperator, bool overwrite = false)
+void scriptmodel::saveFile(csvlist<string> &targetObject, filesystem::path filename, string seperator, bool overwrite, short *data_std)
 {
     ofstream savefile;
     int i = 0;
@@ -158,35 +195,62 @@ void scriptmodel::saveFile(csvlist<string> &targetObject, filesystem::path filen
         savefile.open(filename,std::ofstream::out | std::ofstream::app);
         i = targetObject.getWritePos();
     }
-    for (;i <= targetObject.getMaxRows()-1;i++) {
-        list<string> line = targetObject.getline(i);
-        auto line_col_it = line.begin();
-        while(line_col_it != line.end())
-        {
-            string temp = *line_col_it;
-            savefile<< temp;
-            line_col_it++;
-            if (line_col_it != line.end())
+    if (*data_std == 1)
+    {
+        for (;i <= targetObject.getMaxRows()-1;i++) {
+            list<string> line = targetObject.getline(i);
+            auto line_col_it = line.begin();
+            while(line_col_it != line.end())
             {
-                savefile << seperator;
+                string temp = *line_col_it;
+                savefile<< temp;
+                line_col_it++;
+                if (line_col_it != line.end())
+                {
+                    savefile << seperator;
+                }
+                else {
+                    savefile << endl;
+                }
             }
-            else {
-                savefile << endl;
-            }
+            targetObject.setWritePos(i+1);
         }
-        targetObject.setWritePos(i+1);
+    }
+    if (*data_std == 0)
+    {
+        for (;i <= targetObject.getMaxRows()-1;i++) {
+            list<string> line = targetObject.getline(i);
+            string audio_temp = line.back();
+            line.pop_back();
+            line.push_front(audio_temp);
+            auto line_col_it = line.begin();
+            while(line_col_it != line.end())
+            {
+                string temp = *line_col_it;
+                savefile<< temp;
+                line_col_it++;
+                if (line_col_it != line.end())
+                {
+                    savefile << seperator;
+                }
+                else {
+                    savefile << endl;
+                }
+            }
+            targetObject.setWritePos(i+1);
+        }
     }
     savefile.close();
 }
 
-void scriptmodel::saveProgress(filesystem::path filename)
+void scriptmodel::saveProgress(filesystem::path filename, short* data_std)
 {
-    saveFile(_resultList,filename,"|");
+    saveFile(_resultList,filename,"|",false,data_std);
 }
 
-void scriptmodel::saveOrigScript(filesystem::path filename)
+void scriptmodel::saveOrigScript(filesystem::path filename, short* data_std)
 {
-    saveFile(_workingList,filename,"|",true);
+    saveFile(_workingList,filename,"|",true,data_std);
 }
 
 void scriptmodel::playAudio(filesystem::path a_path, string _audiofile, qint64 position)

@@ -1,5 +1,6 @@
 
 #include <QMainWindow>
+#include "MySliderStype.h"
 #include "vcontroller.h"
 #pragma once
 
@@ -56,7 +57,10 @@ private slots:
 
     void on_horizontalSlider_sliderReleased();
 
+    void on_horizontalSlider_sliderMoved(int position);
+
 private:
     vController * _controller;
     Ui::MainWindow *ui;
+    MySliderStyle* mahslidesyle;
 };

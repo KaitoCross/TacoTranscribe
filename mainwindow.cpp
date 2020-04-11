@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    mahslidesyle = new MySliderStyle(ui->horizontalSlider->style());
 }
 
 MainWindow::~MainWindow()
@@ -63,6 +64,11 @@ void MainWindow::enableAudioBtns()
 {
     ui->replayBtn->setEnabled(true);
     ui->playNextBtn->setEnabled(true);
+    //ui->horizontalSlider->setMouseTracking(true);
+    if (mahslidesyle != nullptr)
+    {
+        ui->horizontalSlider->setStyle(mahslidesyle);
+    }
 }
 
 void MainWindow::enableTextBtns()
@@ -144,5 +150,10 @@ void MainWindow::on_actionSaveSavepoint_triggered()
 
 void MainWindow::on_horizontalSlider_sliderReleased()
 {
-        _controller->jumpInAudio(ui->horizontalSlider->sliderPosition());
+     _controller->jumpInAudio(ui->horizontalSlider->sliderPosition());
+}
+
+void MainWindow::on_horizontalSlider_sliderMoved(int position)
+{
+    //_controller->jumpInAudio(position)
 }
