@@ -1,8 +1,3 @@
-#ifndef MYSLIDERSTYPE_H
-#define MYSLIDERSTYPE_H
-
-#endif // MYSLIDERSTYPE_H
-
 #include <QProxyStyle>
 
 class MySliderStyle : public QProxyStyle

@@ -19,7 +19,7 @@ public:
     void loadWorkingFile(std::string, short *data_std);
     void loadNextLine(list<string>);
     void setAudioDir(string dir);
-    void playCurrentAudio(qint64 position);
+    void playCurrentAudio(qint64 position = 0, bool redraw = false);
     void playNextAudio();
     void shiftAudioAlignmentUp();
     void shiftAudioAlignmentDown();
@@ -34,7 +34,7 @@ public:
     void saveOrigScript(std::filesystem::path filename,short *data_std);
     void enableButtons();
 private:
-    void playAudio(filesystem::path a_path, string _audiofile, qint64 position = 0);
+    void playAudio(filesystem::path a_path, string _audiofile, qint64 position = 0, bool redraw = false);
     vController *_my_control;
     std::string _audiodir;
     MainWindow *_main_win;

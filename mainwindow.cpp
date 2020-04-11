@@ -8,11 +8,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mahslidesyle = new MySliderStyle(ui->horizontalSlider->style());
+    mahslidesyle = new MySliderStyle("sliderfix");
 }
 
 MainWindow::~MainWindow()
 {
+    delete mahslidesyle;
     delete ui;
 }
 
@@ -64,7 +65,6 @@ void MainWindow::enableAudioBtns()
 {
     ui->replayBtn->setEnabled(true);
     ui->playNextBtn->setEnabled(true);
-    //ui->horizontalSlider->setMouseTracking(true);
     if (mahslidesyle != nullptr)
     {
         ui->horizontalSlider->setStyle(mahslidesyle);
@@ -85,6 +85,13 @@ void MainWindow::updateProgBar(int max, int current)
 {
     ui->progressBar->setMaximum(max);
     ui->progressBar->setValue(current);
+}
+
+void MainWindow::drawAudio(QString file)
+{
+    ui->audioGraphWidget->setSource(file);
+    //ui->audioGraphWidget->setBuffer();
+    //ui->audioGraphWidget->plot();
 }
 
 void MainWindow::on_position_change(int position)
@@ -151,9 +158,4 @@ void MainWindow::on_actionSaveSavepoint_triggered()
 void MainWindow::on_horizontalSlider_sliderReleased()
 {
      _controller->jumpInAudio(ui->horizontalSlider->sliderPosition());
-}
-
-void MainWindow::on_horizontalSlider_sliderMoved(int position)
-{
-    //_controller->jumpInAudio(position)
 }

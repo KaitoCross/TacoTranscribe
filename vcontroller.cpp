@@ -22,7 +22,7 @@ shortened_script_file_data_std = 0;
 void vController::onLoadOrigScript()
 {
     short data_standard = 0;
-    string script_filename = loadTextFile(&data_standard);
+    string script_filename = loadTextFile("Load Base Voice Line Script",&data_standard);
     if (!script_filename.empty())
         _scriptModel->loadWorkingFile(script_filename,&data_standard);
 }
@@ -47,7 +47,7 @@ void vController::onLoadAudioDir()
 
 void vController::onReplay()
 {
-    _scriptModel->playCurrentAudio(0);
+    _scriptModel->playCurrentAudio(0,false);
 }
 
 void vController::onNextAudioBtn()
@@ -92,7 +92,7 @@ void vController::onUnsuitableAudio()
 void vController::onLoadSavedProgress()
 {
     short data_standard = 0;
-    string savepoint_filename = loadTextFile(&data_standard);
+    string savepoint_filename = loadTextFile("Load Savepoint File",&data_standard);
     if (!savepoint_filename.empty())
         _scriptModel->loadProgressFile(savepoint_filename, &data_standard);
 }
@@ -129,12 +129,12 @@ void vController::jumpInAudio(qint64 position)
     _scriptModel->playCurrentAudio(position);
 }
 
-string vController::loadTextFile(short *data_std)
+string vController::loadTextFile(QString dia_title, short *data_std)
 {
     QString chosenFilter = "";
     //*data_std = 0; //Default LJSpeech-compliant data. 1 = noncompliant
     QString fileName = QFileDialog::getOpenFileName(nullptr,
-           "Open Voice Line File", "",
+           dia_title, "",
            SUPPORTEDFILETYPES,&chosenFilter);
     std::string script_filename = fileName.toStdString();
     if (chosenFilter != "")
@@ -143,7 +143,7 @@ string vController::loadTextFile(short *data_std)
         if (chosenFilter.contains("non-compliant"))
         {
             *data_std = 1;
-            std::cout << "chosenFilter is detected noncompliant" << endl;
+            //std::cout << "chosenFilter is detected noncompliant" << endl;
         }
     }
     return script_filename;
@@ -157,7 +157,7 @@ std::filesystem::path vController::saveFileDialogue(QString dialogueTitle, short
            SUPPORTEDFILETYPES,&chosenFilter);
     if (chosenFilter != "")
     {
-        std::cout << "chosenFilter is " << chosenFilter.toStdString() << endl;
+        //std::cout << "chosenFilter is " << chosenFilter.toStdString() << endl;
         if (chosenFilter.contains("non-compliant"))
         {
             *data_std = 1;

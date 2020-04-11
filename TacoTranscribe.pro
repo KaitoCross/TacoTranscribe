@@ -5,8 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui multimedia
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 TARGET = TacoTranscribe
 TEMPLATE = app
@@ -25,18 +24,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++17
 
 SOURCES += \
+        audiograph.cpp \
         csvlist.cpp \
         main.cpp \
         mainwindow.cpp \
         scriptmodel.cpp \
-        vcontroller.cpp
+        vcontroller.cpp \
+        qcustomplot.cpp
 
 HEADERS += \
-        MySliderStype.h \
+        MySliderStyle.h \
+        audiograph.h \
         csvlist.h \
         mainwindow.h \
         scriptmodel.h \
-        MySliderStype.h \
+        qcustomplot.h \
         vcontroller.h
 
 FORMS += \

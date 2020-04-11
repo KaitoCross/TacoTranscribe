@@ -52,7 +52,7 @@ void scriptmodel::setAudioDir(string dir)
     _audiodir = dir;
     if (!_currentLine.empty())
     {
-        playCurrentAudio(0);
+        playCurrentAudio(0,true);
     }
     enableButtons();
 }
@@ -66,12 +66,12 @@ void scriptmodel::enableButtons()
     }
 }
 
-void scriptmodel::playCurrentAudio(qint64 position = 0)
+void scriptmodel::playCurrentAudio(qint64 position, bool redraw)
 {
     filesystem::path a_path = filesystem::path(_audiodir);
     a_path.append(audiofile);
     std::cout<<audiofile << " is the audio"<<endl;
-    playAudio(a_path, audiofile, position);
+    playAudio(a_path, audiofile, position,redraw);
 }
 
 void scriptmodel::playNextAudio()
@@ -81,9 +81,9 @@ void scriptmodel::playNextAudio()
     auto next_line = _workingList[_workingList.getReadPos()];
     if (!next_line.empty())
     {
-    next_audio = next_line.back();
-    a_path.append(next_audio);
-    playAudio(a_path, next_audio);
+        next_audio = next_line.back();
+        a_path.append(next_audio);
+        playAudio(a_path, next_audio,0,false);
     }
 }
 
@@ -253,14 +253,19 @@ void scriptmodel::saveOrigScript(filesystem::path filename, short* data_std)
     saveFile(_workingList,filename,"|",true,data_std);
 }
 
-void scriptmodel::playAudio(filesystem::path a_path, string _audiofile, qint64 position)
+void scriptmodel::playAudio(filesystem::path a_path, string _audiofile, qint64 position, bool redraw)
 {
     if (filesystem::exists(a_path))
     {
-        mediaPlayer->setMedia(QUrl::fromLocalFile(QString::fromStdString(a_path.string())));
+        QString tmp_path = QString::fromStdString(a_path.string());
+        mediaPlayer->setMedia(QUrl::fromLocalFile(tmp_path));
         mediaPlayer->setPosition(position);
         mediaPlayer->play();
         _main_win->setAudiofileLabel(_audiofile);
+        if (redraw)
+        {
+            _main_win->drawAudio(tmp_path);
+        }
     }
     else {
         if (_audiofile=="#missingaudio#")
@@ -284,6 +289,6 @@ void scriptmodel::refreshView(list<string> firstLine = list<string>())
     firstLine.pop_front();
     audiofile = firstLine.front();
     _main_win->setAudiofileLabel(audiofile);
-    playCurrentAudio();
+    playCurrentAudio(0,true);
     _main_win->updateProgBar(_workingList.getMaxRows(),_workingList.getReadPos()-1);
 }

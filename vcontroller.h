@@ -31,6 +31,6 @@ private:
     short savepoint_file_data_std;
     std::filesystem::path savedScriptFile;
     short shortened_script_file_data_std;
-    std::string loadTextFile(short *data_std);
+    std::string loadTextFile(QString dia_title, short *data_std);
     std::filesystem::path saveFileDialogue(QString dialogueTitle, short *data_std);
 };

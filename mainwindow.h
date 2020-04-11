@@ -1,6 +1,6 @@
 
 #include <QMainWindow>
-#include "MySliderStype.h"
+#include "MySliderStyle.h"
 #include "vcontroller.h"
 #pragma once
 
@@ -24,6 +24,8 @@ public:
     void enableAudioBtns();
     void enableTextBtns();
     void updateProgBar(int max, int current);
+    void drawAudio(QString file);
+
 public slots:
     void on_position_change(int position);
     void on_duration_change(int duration);
@@ -56,8 +58,6 @@ private slots:
     void on_actionSaveSavepoint_triggered();
 
     void on_horizontalSlider_sliderReleased();
-
-    void on_horizontalSlider_sliderMoved(int position);
 
 private:
     vController * _controller;
