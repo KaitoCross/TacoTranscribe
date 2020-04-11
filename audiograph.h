@@ -5,7 +5,7 @@
 #include <QAudioBuffer>
 
 
-//From thibsc:
+//Based code off thibsc's code:
 //https://stackoverflow.com/a/50294040
 
 
@@ -19,6 +19,7 @@ class AudioGraph : public QCustomPlot
         AudioGraph(QWidget *parent = Q_NULLPTR);
         ~AudioGraph();
         void setSource(const QString &fileName);
+        int getSampleRate();
 
     public slots:
         void setBuffer();

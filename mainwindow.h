@@ -2,6 +2,7 @@
 #include <QMainWindow>
 #include "MySliderStyle.h"
 #include "vcontroller.h"
+#include "audiograph.h"
 #pragma once
 
 
@@ -58,6 +59,8 @@ private slots:
     void on_actionSaveSavepoint_triggered();
 
     void on_horizontalSlider_sliderReleased();
+
+    void on_audioGraphWidget_plottableClick(QCPAbstractPlottable* plottable, int dataIndex, QMouseEvent *event);
 
 private:
     vController * _controller;

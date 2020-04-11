@@ -157,5 +157,15 @@ void MainWindow::on_actionSaveSavepoint_triggered()
 
 void MainWindow::on_horizontalSlider_sliderReleased()
 {
-     _controller->jumpInAudio(ui->horizontalSlider->sliderPosition());
+    _controller->jumpInAudio(ui->horizontalSlider->sliderPosition());
+}
+
+void MainWindow::on_audioGraphWidget_plottableClick(QCPAbstractPlottable *plottable, int dataIndex, QMouseEvent *event)
+{
+    if (event->type()==QEvent::MouseButtonRelease)
+    {
+        double samples_ms = ui->audioGraphWidget->getSampleRate()/1000.0;
+        qint64 newPos = (dataIndex*2)/samples_ms;
+        _controller->jumpInAudio(newPos);
+    }
 }

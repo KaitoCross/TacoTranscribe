@@ -32,6 +32,11 @@ void AudioGraph::setSource(const QString &fileName)
     decoder->start();
 }
 
+int AudioGraph::getSampleRate()
+{
+    return buffer.format().sampleRate();
+}
+
 void AudioGraph::setBuffer()
 {
     buffer = decoder->read();
