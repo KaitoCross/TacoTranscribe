@@ -11,6 +11,9 @@ scriptmodel::scriptmodel()
     audiofile="";
     _currentLine = list<string>();
     mediaPlayer = new QMediaPlayer();
+    //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
+    mediaPlayer->setNotifyInterval(100);
+    //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
 }
 
 scriptmodel::~scriptmodel()
@@ -66,11 +69,13 @@ void scriptmodel::enableButtons()
     }
 }
 
-void scriptmodel::playCurrentAudio(qint64 position, bool redraw)
+void scriptmodel::playCurrentAudio(qint64 position, bool redraw, bool jump)
 {
     filesystem::path a_path = filesystem::path(_audiodir);
     a_path.append(audiofile);
-    std::cout<<audiofile << " is the audio"<<endl;
+    //std::cout<<audiofile << " is the audio"<<endl;
+    if (jump)
+        mediaPlayer->pause();
     playAudio(a_path, audiofile, position,redraw);
 }
 
@@ -259,6 +264,9 @@ void scriptmodel::playAudio(filesystem::path a_path, string _audiofile, qint64 p
     {
         QString tmp_path = QString::fromStdString(a_path.string());
         mediaPlayer->setMedia(QUrl::fromLocalFile(tmp_path));
+        //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
+        mediaPlayer->setNotifyInterval(20);
+        //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
         mediaPlayer->setPosition(position);
         mediaPlayer->play();
         _main_win->setAudiofileLabel(_audiofile);

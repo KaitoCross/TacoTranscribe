@@ -126,7 +126,7 @@ void vController::onSave(bool progress)
 
 void vController::jumpInAudio(qint64 position)
 {
-    _scriptModel->playCurrentAudio(position);
+    _scriptModel->playCurrentAudio(position,false,true);
 }
 
 string vController::loadTextFile(QString dia_title, short *data_std)

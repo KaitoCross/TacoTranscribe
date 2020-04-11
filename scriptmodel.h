@@ -19,7 +19,7 @@ public:
     void loadWorkingFile(std::string, short *data_std);
     void loadNextLine(list<string>);
     void setAudioDir(string dir);
-    void playCurrentAudio(qint64 position = 0, bool redraw = false);
+    void playCurrentAudio(qint64 position = 0, bool redraw = false, bool jump = false);
     void playNextAudio();
     void shiftAudioAlignmentUp();
     void shiftAudioAlignmentDown();

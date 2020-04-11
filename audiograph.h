@@ -20,6 +20,7 @@ class AudioGraph : public QCustomPlot
         ~AudioGraph();
         void setSource(const QString &fileName);
         int getSampleRate();
+        void plotProgress(qint64 pos);
 
     public slots:
         void setBuffer();
@@ -32,6 +33,8 @@ class AudioGraph : public QCustomPlot
         QAudioBuffer buffer;
         QVector<double> samples;
         QCPGraph *wavePlot;
+        QCPGraph *progressPlot;
+        QString currentFile;
 
 };
 

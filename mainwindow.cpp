@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include <iostream>
 #include <QPlainTextEdit>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -96,7 +96,9 @@ void MainWindow::drawAudio(QString file)
 
 void MainWindow::on_position_change(int position)
 {
+    //std::cout << position << std::endl;
     ui->horizontalSlider->setSliderPosition(position);
+    ui->audioGraphWidget->plotProgress(position);
 }
 
 void MainWindow::on_duration_change(int duration)

@@ -10,7 +10,9 @@ AudioGraph::AudioGraph(QWidget *parent)
     : QCustomPlot(parent)
     , decoder(new QAudioDecoder(this))
 {
+    currentFile="";
     wavePlot = addGraph();
+    progressPlot = addGraph();
     setMinimumHeight(100);
     connect(decoder, SIGNAL(bufferReady()), this, SLOT(setBuffer()));
     connect(decoder, SIGNAL(finished()), this, SLOT(plot()));
@@ -21,20 +23,38 @@ AudioGraph::~AudioGraph()
     samples.clear();
     delete decoder;
     wavePlot->data()->clear();
+    progressPlot->data()->clear();
     this->removePlottable(wavePlot);
+    this->removePlottable(progressPlot);
 }
 
 void AudioGraph::setSource(const QString &fileName)
 {
-    wavePlot->data()->clear();
-    samples.clear();
-    decoder->setSourceFilename(fileName);
-    decoder->start();
+    if (currentFile != fileName)
+    {
+        currentFile = fileName;
+        wavePlot->data()->clear();
+        samples.clear();
+        decoder->setSourceFilename(currentFile);
+        decoder->start();
+    }
 }
 
 int AudioGraph::getSampleRate()
 {
     return buffer.format().sampleRate();
+}
+
+void AudioGraph::plotProgress(qint64 pos)
+{
+    if (pos > 0)
+    {
+        progressPlot->data()->clear();
+        double xPos = pos / 1000.0;
+        progressPlot->addData(xPos,0.99);
+        progressPlot->addData(xPos,-0.99);
+        replot();
+    }
 }
 
 void AudioGraph::setBuffer()
@@ -45,7 +65,7 @@ void AudioGraph::setBuffer()
     if (buffer.format().sampleType() == QAudioFormat::Float)
     {
         const float *fldata = buffer.constData<float>();
-        int count = buffer.sampleCount() / 2;
+        int count = buffer.sampleCount()/2;
         for (int i=0; i<count; i++){
             double val = fldata[i]/peak;
             samples.append(val);
@@ -76,12 +96,14 @@ void AudioGraph::plot()
     int sampleRate = buffer.format().sampleRate();
     QVector<double> x(samples.size());
     for (int i=0; i<x.size(); i++)
-        x[i] = ((double)i)/sampleRate;
+        x[i] = (i*2.0)/sampleRate;
     wavePlot->addData(x, samples);
     yAxis->setRange(QCPRange(-1, 1));
-    xAxis->setRange(QCPRange(0, (double(samples.size()))/sampleRate));
+    xAxis->setRange(QCPRange(0, (samples.size()*2.0)/sampleRate));
     replot();
 }
+
+
 
 /**
  * https://stackoverflow.com/questions/46947668/draw-waveform-from-raw-data-using-qaudioprobe
