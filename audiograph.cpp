@@ -68,12 +68,13 @@ void AudioGraph::setBuffer()
 
 void AudioGraph::plot()
 {
+    int sampleRate = buffer.format().sampleRate();
     QVector<double> x(samples.size());
     for (int i=0; i<x.size(); i++)
-        x[i] = i;//buffer.format().sampleRate();
+        x[i] = ((double)i)/sampleRate;
     wavePlot->addData(x, samples);
     yAxis->setRange(QCPRange(-1, 1));
-    xAxis->setRange(QCPRange(0, samples.size()));
+    xAxis->setRange(QCPRange(0, (double(samples.size()))/sampleRate));
     replot();
 }
 
