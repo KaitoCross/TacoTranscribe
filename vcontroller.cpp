@@ -150,7 +150,7 @@ std::string vController::loadTextFile(QString dia_title, short *data_std)
         if (chosenFilter.contains("non-compliant"))
         {
             *data_std = 1;
-            //std::cout << "chosenFilter is detected noncompliant" << endl;
+            //std::cout << "chosenFilter is detected noncompliant" << std::endl;
         }
     }
     return script_filename;
@@ -164,7 +164,7 @@ filesystem_os_specific::path vController::saveFileDialogue(QString dialogueTitle
            SUPPORTEDFILETYPES,&chosenFilter);
     if (chosenFilter != "")
     {
-        //std::cout << "chosenFilter is " << chosenFilter.toStdString() << endl;
+        //std::cout << "chosenFilter is " << chosenFilter.toStdString() << std::endl;
         if (chosenFilter.contains("non-compliant"))
         {
             *data_std = 1;

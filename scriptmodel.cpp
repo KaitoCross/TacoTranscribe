@@ -12,9 +12,9 @@ scriptmodel::scriptmodel()
     audiofile="";
     _currentLine = std::list<std::string>();
     mediaPlayer = new QMediaPlayer();
-    //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
+    //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << std::endl;
     mediaPlayer->setNotifyInterval(100);
-    //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
+    //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << std::endl;
 }
 
 scriptmodel::~scriptmodel()
@@ -80,7 +80,7 @@ void scriptmodel::playCurrentAudio(qint64 position, bool redraw, bool jump)
 {
     filesystem_os_specific::path a_path = filesystem_os_specific::path(_audiodir);
     a_path.append(audiofile);
-    //std::cout<<audiofile << " is the audio"<<endl;
+    //std::cout<<audiofile << " is the audio"<<std::endl;
     if (jump)
         mediaPlayer->pause();
     playAudio(a_path, audiofile, position,redraw);
@@ -222,7 +222,7 @@ void scriptmodel::saveFile(csvlist<std::string> &targetObject, filesystem_os_spe
                     savefile << seperator;
                 }
                 else {
-                    savefile << endl;
+                    savefile << std::endl;
                 }
             }
             targetObject.setWritePos(i+1);
@@ -246,7 +246,7 @@ void scriptmodel::saveFile(csvlist<std::string> &targetObject, filesystem_os_spe
                     savefile << seperator;
                 }
                 else {
-                    savefile << endl;
+                    savefile << std::endl;
                 }
             }
             targetObject.setWritePos(i+1);
@@ -271,9 +271,9 @@ void scriptmodel::playAudio(filesystem_os_specific::path a_path, std::string _au
     {
         QString tmp_path = QString::fromStdString(a_path.string());
         mediaPlayer->setMedia(QUrl::fromLocalFile(tmp_path));
-        //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
+        //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << std::endl;
         mediaPlayer->setNotifyInterval(20);
-        //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
+        //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << std::endl;
         mediaPlayer->setPosition(position);
         mediaPlayer->play();
         _main_win->setAudiofileLabel(_audiofile);
