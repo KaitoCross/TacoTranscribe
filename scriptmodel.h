@@ -2,9 +2,20 @@
 #include <QMediaPlayer>
 #include <QObject>
 #include <fstream>
-#include <filesystem>
 #include <string>
 #include <sstream>
+
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
+
+#ifdef __unix__
+#include <filesystem>
+#define filesystem_os_specific std::filesystem
+
+#elif defined(_WIN32) || defined(WIN32) || defined(WIN64) || defined(_WIN64)
+#include <experimental/filesystem>
+#define filesystem_os_specific std::experimental::filesystem
+
+#endif
 
 class vController;
 class MainWindow;
@@ -17,31 +28,35 @@ public:
     ~scriptmodel();
     scriptmodel(vController&, MainWindow&);
     void loadWorkingFile(std::string, short *data_std);
-    void loadNextLine(list<string>);
-    void setAudioDir(string dir);
+    void loadNextLine(std::list<std::string>);
+    void setAudioDir(std::string dir);
     void playCurrentAudio(qint64 position = 0, bool redraw = false, bool jump = false);
     void playNextAudio();
     void shiftAudioAlignmentUp();
     void shiftAudioAlignmentDown();
-    void replaceAudiofile(string);
+    void replaceAudiofile(std::string);
     void markCurrentAudioMissing();
     void removeCurrLine();
-    void loadProgressFile(string fileName, short *data_standard);
+    void loadProgressFile(std::string fileName, short *data_standard);
     void loadLine(int line, bool forward);
-    int loadFile(string filePath, csvlist<string>& targetObject, bool display = true, short *data_std = nullptr);
-    void saveFile(csvlist<string>& targetObject, std::filesystem::path filename,string seperator,bool overwrite,short *data_std);
-    void saveProgress(std::filesystem::path filename,short *data_std);
-    void saveOrigScript(std::filesystem::path filename,short *data_std);
+    int loadFile(std::string filePath, csvlist<std::string>& targetObject, bool display = true, short *data_std = nullptr);
+    void saveFile(csvlist<std::string>& targetObject, filesystem_os_specific::path filename,std::string seperator,bool overwrite,short *data_std);
+    void saveProgress(filesystem_os_specific::path filename,short *data_std);
+    void saveOrigScript(filesystem_os_specific::path filename,short *data_std);
     void enableButtons();
+
+public slots:
+    void audioError();
+
 private:
-    void playAudio(filesystem::path a_path, string _audiofile, qint64 position = 0, bool redraw = false);
+    void playAudio(filesystem_os_specific::path a_path, std::string _audiofile, qint64 position = 0, bool redraw = false);
     vController *_my_control;
     std::string _audiodir;
     MainWindow *_main_win;
     QMediaPlayer *mediaPlayer;
     csvlist<std::string> _workingList;
     csvlist<std::string> _resultList;
-    list<std::string> _currentLine;
-    void refreshView(list<string>);
-    string audiofile;
+    std::list<std::string> _currentLine;
+    void refreshView(std::list<std::string>);
+    std::string audiofile;
 };

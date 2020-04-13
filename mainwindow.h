@@ -3,6 +3,7 @@
 #include "MySliderStyle.h"
 #include "vcontroller.h"
 #include "audiograph.h"
+#include <QMediaPlayer>
 #pragma once
 
 
@@ -26,10 +27,12 @@ public:
     void enableTextBtns();
     void updateProgBar(int max, int current);
     void drawAudio(QString file);
+    void showErrMsg(const QString & message, const QString & type);
 
 public slots:
     void on_position_change(int position);
     void on_duration_change(int duration);
+    void audioError(QMediaPlayer::Error error);
 
 private slots:
     void on_replayBtn_clicked();
@@ -66,4 +69,5 @@ private:
     vController * _controller;
     Ui::MainWindow *ui;
     MySliderStyle* mahslidesyle;
+    QErrorMessage *errDialog;
 };

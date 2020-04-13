@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <iostream>
+#include <string>
 #include <QPlainTextEdit>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -9,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     mahslidesyle = new MySliderStyle("sliderfix");
+    errDialog = QErrorMessage::qtHandler();
 }
 
 MainWindow::~MainWindow()
@@ -94,6 +96,11 @@ void MainWindow::drawAudio(QString file)
     //ui->audioGraphWidget->plot();
 }
 
+void MainWindow::showErrMsg(const QString &message, const QString &type)
+{
+    errDialog->showMessage(message,type);
+}
+
 void MainWindow::on_position_change(int position)
 {
     //std::cout << position << std::endl;
@@ -104,6 +111,37 @@ void MainWindow::on_position_change(int position)
 void MainWindow::on_duration_change(int duration)
 {
     ui->horizontalSlider->setMaximum(duration);
+}
+
+void MainWindow::audioError(QMediaPlayer::Error error)
+{
+    short errnr=0;
+    std::string errmsg="";
+    switch (error){
+    case QMediaPlayer::NoError: errmsg="No error has occurred.";
+        break;
+    case QMediaPlayer::ResourceError: errmsg="The media resource couldn't be resolved.";
+        errnr=1;
+        break;
+    case QMediaPlayer::FormatError: errmsg="The format of a media resource isn't supported.";
+        errnr=2;
+        break;
+    case QMediaPlayer::AccessDeniedError: errmsg="There are not the appropriate permissions to play the media resource.";
+        errnr=3;
+        break;
+    case QMediaPlayer::ServiceMissingError: errmsg="A valid playback service was not found, playback cannot proceed.";
+        errnr=4;
+        break;
+    case QMediaPlayer::MediaIsPlaylist: errmsg="Media resource is a playlist.";
+        errnr=4;
+        break;
+    case QMediaPlayer::NetworkError: errmsg="Network Error.";
+        errnr=4;
+        break;
+    }
+    QString errstring = QString::fromStdString("Error Playback! Error no. "+std::to_string(errnr) + " " +errmsg);
+    errDialog->showMessage(errstring,QString::fromStdString(errmsg));
+    //setAudiofileLabel(errstring);
 }
 
 void MainWindow::addListener(vController &controller)

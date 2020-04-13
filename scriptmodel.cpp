@@ -2,14 +2,15 @@
 #include "scriptmodel.h"
 #include "mainwindow.h"
 #include <iostream>
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
 
 scriptmodel::scriptmodel()
 {
-    _workingList = csvlist<string>(3);
-    _resultList = csvlist<string>(3);
+    _workingList = csvlist<std::string>(3);
+    _resultList = csvlist<std::string>(3);
     _audiodir="";
     audiofile="";
-    _currentLine = list<string>();
+    _currentLine = std::list<std::string>();
     mediaPlayer = new QMediaPlayer();
     //cout << "notifyInterval " <<mediaPlayer->notifyInterval() << endl;
     mediaPlayer->setNotifyInterval(100);
@@ -23,34 +24,35 @@ scriptmodel::~scriptmodel()
 
 scriptmodel::scriptmodel(vController& vcont, MainWindow& mwin)
 {
-    _workingList = csvlist<string>(3);
-    _resultList = csvlist<string>(3);
+    _workingList = csvlist<std::string>(3);
+    _resultList = csvlist<std::string>(3);
     _my_control = &vcont;
     _main_win = &mwin;
     _audiodir="";
     audiofile="";
-    _currentLine = list<string>();
+    _currentLine = std::list<std::string>();
     mediaPlayer = new QMediaPlayer();
     _main_win->updateProgBar(100,0);
     QObject::connect(mediaPlayer, &QMediaPlayer::positionChanged,&mwin,&MainWindow::on_position_change);
     QObject::connect(mediaPlayer, &QMediaPlayer::durationChanged,&mwin,&MainWindow::on_duration_change);
+    QObject::connect(mediaPlayer, QOverload<QMediaPlayer::Error>::of(&QMediaPlayer::error),&mwin,&MainWindow::audioError);
 }
 
-void scriptmodel::loadWorkingFile(string filePath, short *data_std)
+void scriptmodel::loadWorkingFile(std::string filePath, short *data_std)
 {
     //_workingList = csvlist<string>(3);
     loadFile(filePath,_workingList,true,data_std);
     enableButtons();
 }
 
-void scriptmodel::loadNextLine(list<string> args)
+void scriptmodel::loadNextLine(std::list<std::string> args)
 {
     _resultList.push_back(args);
     _currentLine =_workingList.getline();
     refreshView(_currentLine);
 }
 
-void scriptmodel::setAudioDir(string dir)
+void scriptmodel::setAudioDir(std::string dir)
 {
     _audiodir = dir;
     if (!_currentLine.empty())
@@ -69,9 +71,14 @@ void scriptmodel::enableButtons()
     }
 }
 
+void scriptmodel::audioError()
+{
+    std::cout<<"Audio Error"<<std::endl;
+}
+
 void scriptmodel::playCurrentAudio(qint64 position, bool redraw, bool jump)
 {
-    filesystem::path a_path = filesystem::path(_audiodir);
+    filesystem_os_specific::path a_path = filesystem_os_specific::path(_audiodir);
     a_path.append(audiofile);
     //std::cout<<audiofile << " is the audio"<<endl;
     if (jump)
@@ -81,8 +88,8 @@ void scriptmodel::playCurrentAudio(qint64 position, bool redraw, bool jump)
 
 void scriptmodel::playNextAudio()
 {
-    filesystem::path a_path = filesystem::path(_audiodir);
-    string next_audio;
+    filesystem_os_specific::path a_path = filesystem_os_specific::path(_audiodir);
+    std::string next_audio;
     auto next_line = _workingList[_workingList.getReadPos()];
     if (!next_line.empty())
     {
@@ -95,36 +102,36 @@ void scriptmodel::playNextAudio()
 void scriptmodel::shiftAudioAlignmentUp()
 {
     _workingList.moveColContentUp(3,1);
-    refreshView(list<string>());
+    refreshView(std::list<std::string>());
 }
 
 void scriptmodel::shiftAudioAlignmentDown()
 {
     _workingList.moveColContentDown(3,1);
-    refreshView(list<string>());
+    refreshView(std::list<std::string>());
 }
 
-void scriptmodel::replaceAudiofile(string n_audiofile)
+void scriptmodel::replaceAudiofile(std::string n_audiofile)
 {
     audiofile = n_audiofile;
     _workingList.editRowColContent(3,_workingList.getReadPos()-1,audiofile);
-    refreshView(list<string>());
+    refreshView(std::list<std::string>());
 }
 
 void scriptmodel::markCurrentAudioMissing()
 {
     audiofile = "#missingaudio#";
     _workingList.editRowColContent(3,_workingList.getReadPos()-1,audiofile);
-    refreshView(list<string>());
+    refreshView(std::list<std::string>());
 }
 
 void scriptmodel::removeCurrLine()
 {
     _workingList.deleteRow(_workingList.getReadPos()-1);
-    refreshView(list<string>());
+    refreshView(std::list<std::string>());
 }
 
-void scriptmodel::loadProgressFile(string fileName, short *data_standard)
+void scriptmodel::loadProgressFile(std::string fileName, short *data_standard)
 {
     int lines_loaded = loadFile(fileName,_resultList,true,data_standard);
     loadLine(lines_loaded, true);
@@ -136,20 +143,20 @@ void scriptmodel::loadLine(int line = -1, bool forward = false)
     refreshView(_currentLine);
 }
 
-int scriptmodel::loadFile(string filePath, csvlist<string>& targetObject, bool display, short *data_std)
+int scriptmodel::loadFile(std::string filePath, csvlist<std::string>& targetObject, bool display, short *data_std)
 {
     targetObject.clear();
-    fstream work_f;
-    work_f.open(filePath, ios::in);
-    list<string> row;
-    string word, line, temp;
+    std::fstream work_f;
+    work_f.open(filePath, std::ios::in);
+    std::list<std::string> row;
+    std::string word, line, temp;
     int lines = 0;
     if (*data_std == 1) //nonstandard dataset edit
     {
         while(getline(work_f,line))
         {
             row.clear();
-            stringstream s(line);
+            std::stringstream s(line);
             while(getline(s,word,'|'))
             {
                 row.push_back(word);
@@ -163,12 +170,12 @@ int scriptmodel::loadFile(string filePath, csvlist<string>& targetObject, bool d
         while(getline(work_f,line))
         {
             row.clear();
-            stringstream s(line);
+            std::stringstream s(line);
             while(getline(s,word,'|'))
             {
                 row.push_back(word);
             }
-            string audioName = row.front();
+            std::string audioName = row.front();
             //LJSpeech dataset does not save the audio file extension (.wav, .mp3) in their csv file
             //We require them to be in the dataset!
             //uncommented line would remove the file extension
@@ -187,9 +194,9 @@ int scriptmodel::loadFile(string filePath, csvlist<string>& targetObject, bool d
     return lines;
 }
 
-void scriptmodel::saveFile(csvlist<string> &targetObject, filesystem::path filename, string seperator, bool overwrite, short *data_std)
+void scriptmodel::saveFile(csvlist<std::string> &targetObject, filesystem_os_specific::path filename, std::string seperator, bool overwrite, short *data_std)
 {
-    ofstream savefile;
+    std::ofstream savefile;
     int i = 0;
     if (overwrite)
     {
@@ -203,11 +210,11 @@ void scriptmodel::saveFile(csvlist<string> &targetObject, filesystem::path filen
     if (*data_std == 1)
     {
         for (;i <= targetObject.getMaxRows()-1;i++) {
-            list<string> line = targetObject.getline(i);
+            std::list<std::string> line = targetObject.getline(i);
             auto line_col_it = line.begin();
             while(line_col_it != line.end())
             {
-                string temp = *line_col_it;
+                std::string temp = *line_col_it;
                 savefile<< temp;
                 line_col_it++;
                 if (line_col_it != line.end())
@@ -224,14 +231,14 @@ void scriptmodel::saveFile(csvlist<string> &targetObject, filesystem::path filen
     if (*data_std == 0)
     {
         for (;i <= targetObject.getMaxRows()-1;i++) {
-            list<string> line = targetObject.getline(i);
-            string audio_temp = line.back();
+            std::list<std::string> line = targetObject.getline(i);
+            std::string audio_temp = line.back();
             line.pop_back();
             line.push_front(audio_temp);
             auto line_col_it = line.begin();
             while(line_col_it != line.end())
             {
-                string temp = *line_col_it;
+                std::string temp = *line_col_it;
                 savefile<< temp;
                 line_col_it++;
                 if (line_col_it != line.end())
@@ -248,19 +255,19 @@ void scriptmodel::saveFile(csvlist<string> &targetObject, filesystem::path filen
     savefile.close();
 }
 
-void scriptmodel::saveProgress(filesystem::path filename, short* data_std)
+void scriptmodel::saveProgress(filesystem_os_specific::path filename, short* data_std)
 {
     saveFile(_resultList,filename,"|",false,data_std);
 }
 
-void scriptmodel::saveOrigScript(filesystem::path filename, short* data_std)
+void scriptmodel::saveOrigScript(filesystem_os_specific::path filename, short* data_std)
 {
     saveFile(_workingList,filename,"|",true,data_std);
 }
 
-void scriptmodel::playAudio(filesystem::path a_path, string _audiofile, qint64 position, bool redraw)
+void scriptmodel::playAudio(filesystem_os_specific::path a_path, std::string _audiofile, qint64 position, bool redraw)
 {
-    if (filesystem::exists(a_path))
+    if (filesystem_os_specific::exists(a_path))
     {
         QString tmp_path = QString::fromStdString(a_path.string());
         mediaPlayer->setMedia(QUrl::fromLocalFile(tmp_path));
@@ -283,15 +290,15 @@ void scriptmodel::playAudio(filesystem::path a_path, string _audiofile, qint64 p
     }
 }
 
-void scriptmodel::refreshView(list<string> firstLine = list<string>())
+void scriptmodel::refreshView(std::list<std::string> firstLine = std::list<std::string>())
 {
     if (firstLine.empty())
         //firstLine = _workingList.getRow(_workingList.getCurrentReadPos());
         firstLine = _workingList[_workingList.getReadPos()];
-    string jpnText = firstLine.front();
+    std::string jpnText = firstLine.front();
     _main_win->setJpnText(jpnText);
     firstLine.pop_front();
-    string romaji = firstLine.front();
+    std::string romaji = firstLine.front();
     _main_win->setRomajiView(romaji);
     _main_win->setRomajiEdit(romaji);
     firstLine.pop_front();

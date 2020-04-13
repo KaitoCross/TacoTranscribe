@@ -1,8 +1,10 @@
 #include "vcontroller.h"
 #include "scriptmodel.h"
+#include "mainwindow.h"
 #include <QString>
 #include <QFileDialog>
 #include <iostream>
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING 1
 
 #define SUPPORTEDFILETYPES "LJSpeech-compliant Text Files (*.txt);;LJSpeech-compliant CSV (*.csv);;All LJSpeech-compliant Files (*);;non-compliant Text Files (*.txt);;non-compliant CSV (*.csv);;All non-compliant Files (*)"
 
@@ -22,14 +24,14 @@ shortened_script_file_data_std = 0;
 void vController::onLoadOrigScript()
 {
     short data_standard = 0;
-    string script_filename = loadTextFile("Load Base Voice Line Script",&data_standard);
+    std::string script_filename = loadTextFile("Load Base Voice Line Script",&data_standard);
     if (!script_filename.empty())
         _scriptModel->loadWorkingFile(script_filename,&data_standard);
 }
 
-void vController::onNextLine(string japLine, string editedLine, string audiofile)
+void vController::onNextLine(std::string japLine, std::string editedLine, std::string audiofile)
 {
-    list<string> args;
+    std::list<std::string> args;
     args.push_back(japLine);
     args.push_back(editedLine);
     args.push_back(audiofile);
@@ -73,7 +75,7 @@ void vController::onReassignAudio()
     std::string s_path = fileName.toStdString();
     if (!s_path.empty())
     {
-        filesystem::path realpath(s_path);
+        filesystem_os_specific::path realpath(s_path);
         _scriptModel->replaceAudiofile(realpath.filename().string());
     }
     //_scriptModel->loadWorkingFile(test);
@@ -92,7 +94,7 @@ void vController::onUnsuitableAudio()
 void vController::onLoadSavedProgress()
 {
     short data_standard = 0;
-    string savepoint_filename = loadTextFile("Load Savepoint File",&data_standard);
+    std::string savepoint_filename = loadTextFile("Load Savepoint File",&data_standard);
     if (!savepoint_filename.empty())
         _scriptModel->loadProgressFile(savepoint_filename, &data_standard);
 }
@@ -106,7 +108,7 @@ void vController::onSave(bool progress)
             /*QString fileName = QFileDialog::getSaveFileName(nullptr,
                    "Save edit progress in file", "",
                    "Text Files (*.txt);;All Files (*)");
-            savedProgressFile = std::filesystem::path(fileName.toStdString());*/
+            savedProgressFile = std::filesystem_os_specific::path(fileName.toStdString());*/
             savedProgressFile = saveFileDialogue("Save edit progress in file",&savepoint_file_data_std);
         }
         _scriptModel->saveProgress(savedProgressFile,&savepoint_file_data_std);
@@ -117,7 +119,7 @@ void vController::onSave(bool progress)
             /*QString fileName = QFileDialog::getSaveFileName(nullptr,
                    "Save working copy of Voice Line File", "",
                    "Text Files (*.txt);;All Files (*)");
-            savedScriptFile = std::filesystem::path(fileName.toStdString());*/
+            savedScriptFile = std::filesystem_os_specific::path(fileName.toStdString());*/
             savedScriptFile = saveFileDialogue("Save working copy of Voice Line File",&shortened_script_file_data_std);
         }
         _scriptModel->saveOrigScript(savedScriptFile,&shortened_script_file_data_std);
@@ -129,7 +131,12 @@ void vController::jumpInAudio(qint64 position)
     _scriptModel->playCurrentAudio(position,false,true);
 }
 
-string vController::loadTextFile(QString dia_title, short *data_std)
+void vController::displayError(const QString &message, const QString &type)
+{
+    _window->showErrMsg(message,type);
+}
+
+std::string vController::loadTextFile(QString dia_title, short *data_std)
 {
     QString chosenFilter = "";
     //*data_std = 0; //Default LJSpeech-compliant data. 1 = noncompliant
@@ -139,7 +146,7 @@ string vController::loadTextFile(QString dia_title, short *data_std)
     std::string script_filename = fileName.toStdString();
     if (chosenFilter != "")
     {
-        std::cout << "chosenFilter is " << chosenFilter.toStdString() << endl;
+        std::cout << "chosenFilter is " << chosenFilter.toStdString() << std::endl;
         if (chosenFilter.contains("non-compliant"))
         {
             *data_std = 1;
@@ -149,7 +156,7 @@ string vController::loadTextFile(QString dia_title, short *data_std)
     return script_filename;
 }
 
-std::filesystem::path vController::saveFileDialogue(QString dialogueTitle, short *data_std)
+filesystem_os_specific::path vController::saveFileDialogue(QString dialogueTitle, short *data_std)
 {
     QString chosenFilter = "";
     QString fileName = QFileDialog::getSaveFileName(nullptr,
@@ -161,8 +168,8 @@ std::filesystem::path vController::saveFileDialogue(QString dialogueTitle, short
         if (chosenFilter.contains("non-compliant"))
         {
             *data_std = 1;
-            std::cout << "chosenFilter is detected noncompliant" << endl;
+            std::cout << "chosenFilter is detected noncompliant" << std::endl;
         }
     }
-    return std::filesystem::path(fileName.toStdString());
+    return filesystem_os_specific::path(fileName.toStdString());
 }

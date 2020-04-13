@@ -1,21 +1,27 @@
 #include "audiograph.h"
-#include <QAudioDecoder>
+#include "vcontroller.h"
 #include <algorithm>
 #include <iostream>
 
 //From thibsc:
 //https://stackoverflow.com/a/50294040
 
-AudioGraph::AudioGraph(QWidget *parent)
+AudioGraph::AudioGraph(QWidget *parent, vController* controller)
     : QCustomPlot(parent)
     , decoder(new QAudioDecoder(this))
 {
+    base_control = controller;
     currentFile="";
     wavePlot = addGraph();
     progressPlot = addGraph();
     setMinimumHeight(100);
-    connect(decoder, SIGNAL(bufferReady()), this, SLOT(setBuffer()));
-    connect(decoder, SIGNAL(finished()), this, SLOT(plot()));
+    //std::cout << decoder->errorString().toStdString() << std::endl;
+    //connect(decoder, SIGNAL(bufferReady()), this, SLOT(setBuffer()));
+    //connect(decoder, SIGNAL(finished()), this, SLOT(plot()));
+    QObject::connect(decoder, &QAudioDecoder::bufferReady,this,&AudioGraph::setBuffer);
+    auto test1 = QObject::connect(decoder, &QAudioDecoder::finished,this,&AudioGraph::plot);
+    auto test = QObject::connect(decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error),this,&AudioGraph::errsig);
+    //QObject::connect(decoder, &QAudioDecoder::error,this,&AudioGraph::err);
 }
 
 AudioGraph::~AudioGraph()
@@ -101,6 +107,12 @@ void AudioGraph::plot()
     yAxis->setRange(QCPRange(-1, 1));
     xAxis->setRange(QCPRange(0, (samples.size()*2.0)/sampleRate));
     replot();
+}
+
+void AudioGraph::errsig(QAudioDecoder::Error error)
+{
+    QString errstring = "QAudioDecoder Error: " + decoder->errorString();
+    base_control->displayError(errstring, decoder->errorString());
 }
 
 

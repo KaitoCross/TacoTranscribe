@@ -3,7 +3,7 @@
 #include <list>
 #include <string>
 
-using namespace std;
+//using namespace std;
 
 template <typename T>
 class csvlist
@@ -13,9 +13,9 @@ public:
     {
         _maxSize = 1;
         for (int var = 0; var < _maxSize; var++) {
-            _colList.push_back(list<T>());
-            _colListPoppedFromTop.push_back(list<T>());
-            _colListPoppedFromBottom.push_back(list<T>());
+            _colList.push_back(std::list<T>());
+            _colListPoppedFromTop.push_back(std::list<T>());
+            _colListPoppedFromBottom.push_back(std::list<T>());
         }
         currentReadPos = getRowStartIterators(_colList);
     }
@@ -23,13 +23,13 @@ public:
     {
         _maxSize = cols;
         for (int var = 0; var < _maxSize; var++) {
-            _colList.push_back(list<T>());
-            _colListPoppedFromTop.push_back(list<T>());
-            _colListPoppedFromBottom.push_back(list<T>());
+            _colList.push_back(std::list<T>());
+            _colListPoppedFromTop.push_back(std::list<T>());
+            _colListPoppedFromBottom.push_back(std::list<T>());
         }
         currentReadPos = getRowStartIterators(_colList);
     }
-    void push_back(list<T> newContentLine)
+    void push_back(std::list<T> newContentLine)
     {
          _maxRows++;
          push_back(newContentLine,_colList);
@@ -115,9 +115,9 @@ public:
         //*row_iter = newvalue;
     }
 
-    list<T> getline(int line = -1, bool forward=false)
+    std::list<T> getline(int line = -1, bool forward=false)
     {
-        list<T> result;
+        std::list<T> result;
         if (line == -1)
         {
             result = getRow(_readPos,&_colList,0);
@@ -131,11 +131,11 @@ public:
         }
         return result;
     }
-    list<T> getRow(int row, list<list<T>>* source, int correct = -1)
+    std::list<T> getRow(int row, std::list<std::list<T>>* source, int correct = -1)
     {
-        list<T> result;
-        list<typename list<T>::iterator> iter_list = getRowStartIterators(*source);
-        list<typename list<T>::iterator> iter_end_list = getRowEndIterators(*source);
+        std::list<T> result;
+        std::list<typename std::list<T>::iterator> iter_list = getRowStartIterators(*source);
+        std::list<typename std::list<T>::iterator> iter_end_list = getRowEndIterators(*source);
         for (auto s_iters = iter_list.begin(), e_iters = iter_end_list.begin() ; s_iters != iter_list.end() && e_iters != iter_end_list.end() ; s_iters++, e_iters++) {
             auto sublist_iter = *s_iters;
             auto sublist_iter_end = *e_iters;
@@ -151,12 +151,12 @@ public:
         }
         return result;
     }
-    list<T> getRow(list<typename list<T>::iterator> *rowAddresses)
+    std::list<T> getRow(std::list<typename std::list<T>::iterator> *rowAddresses)
     {
-        list<T> result;
-        list<typename list<T>::iterator> *iter_list = rowAddresses;
-        list<typename list<T>::iterator> iter_end_list = getRowEndIterators(_colList);
-        list<typename list<T>::iterator> newAddresses;
+        std::list<T> result;
+        std::list<typename std::list<T>::iterator> *iter_list = rowAddresses;
+        std::list<typename std::list<T>::iterator> iter_end_list = getRowEndIterators(_colList);
+        std::list<typename std::list<T>::iterator> newAddresses;
         for (auto s_iters = iter_list->begin(), e_iters = iter_end_list.begin() ; s_iters != iter_list->end() && e_iters != iter_end_list.end() ; s_iters++, e_iters++) {
             auto sublist_iter = *s_iters;
             auto sublist_iter_end = *e_iters;
@@ -196,19 +196,19 @@ public:
             }
         }
     }
-    list<string> getCsvList(string);
-    list<string> getCsvList(int, string);
+    std::list<std::string> getCsvList(std::string);
+    std::list<std::string> getCsvList(int, std::string);
     int getReadPos()
     {
         return _readPos;
     }
-    list<T> operator[](int idx)
+    std::list<T> operator[](int idx)
     {
         return getRow(idx, &_colList);
     }
     void deleteRow(int n, bool refreshReadPos = true)
     {
-        list<typename list<T>::iterator> newReadPos;
+        std::list<typename std::list<T>::iterator> newReadPos;
         auto ita = _colList.begin();
         for (;ita != _colList.end(); ita++) {
             auto rowIt = ita->begin();
@@ -236,7 +236,7 @@ public:
         if (refreshReadPos)
             currentReadPos=newReadPos;
     }*/
-    list<typename list<T>::iterator> *getCurrentReadPos()
+    std::list<typename std::list<T>::iterator> *getCurrentReadPos()
     {
         return &currentReadPos;
     }
@@ -253,25 +253,25 @@ public:
         _writePos = pos;
     }
 private:
-    list<typename list<T>::iterator> getRowStartIterators(list<list<T>>& target_list)
+    std::list<typename std::list<T>::iterator> getRowStartIterators(std::list<std::list<T>>& target_list)
     {
         auto ita = target_list.begin();
-        list<typename list<T>::iterator> iter_list;
+        std::list<typename std::list<T>::iterator> iter_list;
         for (;ita != target_list.end();ita++) {
             iter_list.push_back(ita->begin());
         }
         return iter_list;
     }
-    list<typename list<T>::iterator> getRowEndIterators(list<list<T>>& target_list)
+    std::list<typename std::list<T>::iterator> getRowEndIterators(std::list<std::list<T>>& target_list)
     {
         auto ita = target_list.begin();
-        list<typename list<T>::iterator> iter_list;
+        std::list<typename std::list<T>::iterator> iter_list;
         for (;ita != target_list.end();ita++) {
             iter_list.push_back(ita->end());
         }
         return iter_list;
     }
-    void push_back(list<T>& newContentLine, list<list<T>>& target_list)
+    void push_back(std::list<T>& newContentLine, std::list<std::list<T>>& target_list)
     {
      if (newContentLine.size()>= target_list.size())
      {
@@ -282,11 +282,11 @@ private:
      }
      currentReadPos = getRowStartIterators(_colList);
     }
-    list<list<T>> _colListPoppedFromTop;
-    list<list<T>> _colList;
-    list<list<T>> _colListPoppedFromBottom;
-    list<typename list<T>::iterator> currentReadPos;
-    list<typename list<T>::iterator> currentWritePos;
+    std::list<std::list<T>> _colListPoppedFromTop;
+    std::list<std::list<T>> _colList;
+    std::list<std::list<T>> _colListPoppedFromBottom;
+    std::list<typename std::list<T>::iterator> currentReadPos;
+    std::list<typename std::list<T>::iterator> currentWritePos;
     int _readPos = 0;
     int _writePos = 0;
     int _maxSize=0;
