@@ -147,6 +147,7 @@ void MainWindow::audioError(QMediaPlayer::Error error)
 void MainWindow::addListener(vController &controller)
 {
  _controller = &controller;
+ ui->audioGraphWidget->setErrController(_controller);
 }
 
 void MainWindow::on_NextBtn_clicked()

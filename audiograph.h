@@ -15,11 +15,12 @@ class AudioGraph : public QCustomPlot
     Q_OBJECT
 
     public:
-        AudioGraph(QWidget *parent = Q_NULLPTR, vController* controller = nullptr);
+        AudioGraph(QWidget *parent = Q_NULLPTR);
         ~AudioGraph();
         void setSource(const QString &fileName);
         int getSampleRate();
         void plotProgress(qint64 pos);
+        void setErrController(vController* controller);
 
     public slots:
         void setBuffer();

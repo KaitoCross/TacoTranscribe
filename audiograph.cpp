@@ -6,11 +6,10 @@
 //From thibsc:
 //https://stackoverflow.com/a/50294040
 
-AudioGraph::AudioGraph(QWidget *parent, vController* controller)
+AudioGraph::AudioGraph(QWidget *parent)
     : QCustomPlot(parent)
     , decoder(new QAudioDecoder(this))
 {
-    base_control = controller;
     currentFile="";
     wavePlot = addGraph();
     progressPlot = addGraph();
@@ -61,6 +60,11 @@ void AudioGraph::plotProgress(qint64 pos)
         progressPlot->addData(xPos,-0.99);
         replot();
     }
+}
+
+void AudioGraph::setErrController(vController *controller)
+{
+    base_control = controller;
 }
 
 void AudioGraph::setBuffer()
