@@ -127,7 +127,7 @@ public:
         else {
             result = getRow(line,&_colList,0);
             if (forward)
-                _readPos = line;
+                _readPos = line+1;
         }
         return result;
     }
