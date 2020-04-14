@@ -44,6 +44,7 @@ private:
     short savepoint_file_data_std;
     filesystem_os_specific::path savedScriptFile;
     short shortened_script_file_data_std;
+    bool unexpected_redraw;
     std::string loadTextFile(QString dia_title, short *data_std);
     filesystem_os_specific::path saveFileDialogue(QString dialogueTitle, short *data_std);
 };

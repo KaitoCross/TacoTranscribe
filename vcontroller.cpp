@@ -19,6 +19,7 @@ _scriptModel = &lemodel;
 _window = &lawindow;
 savepoint_file_data_std = 0;
 shortened_script_file_data_std = 0;
+bool unexpected_redraw = false;
 }
 
 void vController::onLoadOrigScript()
@@ -49,11 +50,15 @@ void vController::onLoadAudioDir()
 
 void vController::onReplay()
 {
-    _scriptModel->playCurrentAudio(0,false);
+    bool redraw = false;
+    if (unexpected_redraw)
+        redraw = true;
+    _scriptModel->playCurrentAudio(0,redraw);
 }
 
 void vController::onNextAudioBtn()
 {
+    unexpected_redraw = true;
     _scriptModel->playNextAudio();
 }
 
@@ -146,7 +151,7 @@ std::string vController::loadTextFile(QString dia_title, short *data_std)
     std::string script_filename = fileName.toStdString();
     if (chosenFilter != "")
     {
-        std::cout << "chosenFilter is " << chosenFilter.toStdString() << std::endl;
+        //std::cout << "chosenFilter is " << chosenFilter.toStdString() << std::endl;
         if (chosenFilter.contains("non-compliant"))
         {
             *data_std = 1;

@@ -95,7 +95,7 @@ void scriptmodel::playNextAudio()
     {
         next_audio = next_line.back();
         a_path.append(next_audio);
-        playAudio(a_path, next_audio,0,false);
+        playAudio(a_path, next_audio,0,true);
     }
 }
 
