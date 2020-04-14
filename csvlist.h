@@ -204,7 +204,7 @@ public:
     }
     std::list<T> operator[](int idx)
     {
-        return getRow(idx, &_colList);
+        return getRow(idx, &_colList,0);
     }
     void deleteRow(int n, bool refreshReadPos = true)
     {

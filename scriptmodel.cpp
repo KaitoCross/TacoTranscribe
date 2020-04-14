@@ -294,7 +294,7 @@ void scriptmodel::refreshView(std::list<std::string> firstLine = std::list<std::
 {
     if (firstLine.empty())
         //firstLine = _workingList.getRow(_workingList.getCurrentReadPos());
-        firstLine = _workingList[_workingList.getReadPos()];
+        firstLine = _workingList[_workingList.getReadPos()-1];
     std::string jpnText = firstLine.front();
     _main_win->setJpnText(jpnText);
     firstLine.pop_front();
